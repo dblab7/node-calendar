@@ -1,0 +1,28 @@
+<html>
+  <head>
+  <title></title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+	<script>
+		var userAgent = navigator.userAgent;
+		var visitedAt = (new Date()).getTime(); // 방문 시간
+
+		if (userAgent.match(/iPhone|iPad|iPod/)) {
+		   setTimeout(
+			  function() {
+				  if ((new Date()).getTime() - visitedAt < 2000) {
+					   location.href = 
+					   "itms-apps://itunes.apple.com/app/id542613198";
+//					   "https://itunes.apple.com/kr/app/%EB%B0%B4%EB%93%9C-%EB%AA%A8%EC%9E%84%EC%9D%B4-%EC%89%AC%EC%9B%8C%EC%A7%84%EB%8B%A4/id542613198?mt=8";
+				  }
+			   }, 500);
+
+		   setTimeout(function() { 
+				location.href = "bandapp://create/post?"; //naversearchapp://default?version=1
+			}, 0);
+		}
+
+	</script>
+  </head>
+  <body>
+  </body>
+</html>

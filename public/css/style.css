@@ -1,0 +1,54 @@
+.container {
+	width: 900px;
+	height: 100%; 
+}
+
+body {
+	margin-top: 20px;
+	padding: 0;
+	font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+	font-size: 14px;
+}
+
+main {
+	width: 100%; 
+	height: 100%;
+}
+
+footer { 
+}
+
+.chat-button {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+    border: 0px;
+    background: transparent;
+    overflow: hidden;
+    position: fixed;
+    z-index: 16000003;
+    right: 10px;
+    bottom: 0px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    display: none;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 3px 2px;
+    width: 240px;
+    height: 335px; 
+}
+
+.chat-box {
+	background-color: transparent;
+    vertical-align: text-bottom;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0px;
+    overflow: hidden;
+    display: block;
+} 

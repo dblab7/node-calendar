@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+	<% include ./partials/head %>
+	
+	<link href='./css/style.css' rel='stylesheet' />
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="./js/board/socket.js"></script>
+	<script src="./js/board/paper.js"></script>
+	<script type="text/paperscript" src="./js/board/draw.js" canvas="draw"></script>
+	
+	
+	<script src="./js/common.js"></script>
+	
+    <script type="text/javascript"> 
+    </script> 
+
+	<style> 
+		a {
+		  color: #00B7FF;
+		}
+		
+		#draw { 
+			margin: 0 auto; 
+		}
+	</style>
+
+  </head>
+  <body class="container">
+	<header>
+        <% include ./partials/header %>
+    </header>
+	<main>
+        <canvas id="draw" resize="true" keepalive="true"></canvas> 
+    </main>
+	<footer>
+        <% include ./partials/footer %>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+	<% include ./partials/head %>
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+	<link href="./css/jquery.mCustomScrollbar.css" rel="stylesheet" />
+	<link href='./css/memo.css' rel='stylesheet' />
+	<link href='./css/style.css' rel='stylesheet' />
+
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+	<script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="./js/memo.js"></script>
+	<script src="./js/common.js"></script>
+	
+
+    <script type="text/javascript"> 
+		$(document).ready(function() {  
+		}); 
+    </script> 
+
+	<style> 
+		#board {
+			max-width: 900px;
+			margin: 0 auto; 
+			height: 700px;
+		} 
+	</style>
+
+  </head>
+  <body class="container">
+	<header>
+        <% include ./partials/header %>
+    </header>
+	<main> 
+		<div>
+			<button id="undo">Undelete</button>
+			<button id="reset">Reset</button>
+		</div>
+		<div id="board"></div>
+    </main>
+	<footer>
+        <% include ./partials/footer %>
+    </footer>
+  </body>
+</html>

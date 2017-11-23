@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+  <head>
+	<% include ./partials/head %>
+
+	<link href='./css/style.css' rel='stylesheet' />
+
+	<link href='./css/fullcalendar.min.css' rel='stylesheet' />
+	<link href='./css/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+	<link href='./css/fullcalendar.style.css' rel='stylesheet' />
+
+	<script src='./js/moment.min.js'></script>
+	<script src='./js/jquery.min.js'></script>
+	<script src="./js/fullcalendar.js"></script>
+	<script src='./js/jquery-ui.min.js'></script>
+
+	<script src="./js/common.js"></script>
+	
+
+    <script type="text/javascript"> 
+
+		/*var config = {
+			apiKey: "AIzaSyB4feMx3SgEG6C6e6jYMxcb8YplOYvkCoU",
+			authDomain: "calendarapp-45d90.firebaseapp.com",
+			databaseURL: "https://calendarapp-45d90.firebaseio.com",
+			storageBucket: "bucket.appspot.com"
+		  };
+		  firebase.initializeApp(config);
+
+		  // Get a reference to the database service
+		  var database = firebase.database()
+		*/
+		$(document).ready(function() {  
+		
+		var obj = $( this );
+		var calendar; 
+		var events = [];
+		
+		var host = ""; 
+		if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+			host  = "http://localhost:80";
+		}
+		else {
+			host = "http://125.128.119.204:80"
+		} 
+
+		var color =[
+			{index : "0", value : "#0071c5", name : "&#9724; Dark blue"},
+			{index : "1", value : "#40E0D0", name : "&#9724; Turquoise"},
+			{index : "2", value : "#008000", name : "&#9724; Green"},
+			{index : "3", value : "#FFD700", name : "&#9724; Yellow"},
+			{index : "4", value : "#FF8C00", name : "&#9724; Orange"},
+			{index : "5", value : "#FF0000", name : "&#9724; Red"},
+			{index : "6", value : "#000", name : "&#9724; Black"},
+		];		
+
+		var nation =[
+			{index : "0", code : "1101", name : "KOREA", color : "#3498DB", flag : "krw"},
+			{index : "1", code : "1103", name : "CHINA", color : "#1ABB9C", flag : "cny"},
+			{index : "2", code : "1203", name : "HONG KONG", color : "#9B59B6", flag : "hkd"},
+			{index : "3", code : "1210", name : "INDONESIA", color : "#9CC2CB", flag : "idr"},
+			{index : "4", code : "1215", name : "VIETNAM", color : "#E74C3C", flag : "vnd"},
+			{index : "5", code : "2112", name : "U.K", color : "#DB843D", flag : "gbp"},
+			{index : "6", code : "3102", name : "U.S.A", color : "#92A8CD", flag : "usd"},
+			{index : "7", code : "3105", name : "GUATEMALA", color : "#A47D7C", flag : "nio"}
+		];
+		
+		var div =[
+			{index : "0", value : "01", name : "공휴일"},
+			{index : "1", value : "02", name : "연차"},
+			{index : "2", value : "03", name : "기타"}
+		
+		];
+
+		getData();
+		
+			
+	
+		function makeSearch(){
+			$("#dash-modal").find("#modal-body").empty();
+			var modal = ""; 
+			modal += "<div class='dash-form-group'>";
+			modal += "	<label for='title' class='modal-control-label'>Title</label>";
+			modal += "	<div class='modal-col'><input type='text' name='title' class='modal-form-control' id='title' placeholder='Title'></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group admin-item'>";
+			modal += "	<label for='nation' class='modal-control-label' style='color:red;'>Nation</label>";
+			modal += "	<div class='modal-col'><select name='nation' class='modal-form-control' id='nation'></select></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group admin-item'>";
+			modal += "	<label for='div' class='modal-control-label' style='color:red;'>Type</label>";
+			modal += "	<div class='modal-col'><select name='div' class='modal-form-control' id='div'></select></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group color-item'>";
+			modal += "	<label for='color' class='modal-control-label'>Color</label>";
+			modal += "	<div class='modal-col'><select name='color' class='modal-form-control' id='color'></select></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group public-item'>";
+			modal += "	<label for='start' class='modal-control-label'>Start date</label>";
+			modal += "	<div class='modal-col'><input type='text' name='start' class='modal-form-control' id='start' readonly></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group public-item'>";
+			modal += "	<label for='end' class='modal-control-label'>End date</label>";
+			modal += "	<div class='modal-col'><input type='text' name='end' class='modal-form-control' id='end' readonly></div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group'>";
+			modal += "	<label for='end' class='modal-control-label'>Description</label>";
+			modal += "	<div class='modal-col'><textarea name='descr' class='modal-form-control' id='descr' style='height: 55px;'></textarea></div>";
+			modal += "</div>"; 
+			modal += "<div class='dash-form-group public-item'>";
+			modal += "	<div class='modal-col2'>";
+			modal += "		<div class='modal-checkbox'>";
+			modal += "			<label class='text-danger'><input type='checkbox'  name='allday' id='c-allday'> All day</label>";
+			modal += "		</div>";
+			modal += "	</div>";
+			modal += "</div>";
+			modal += "<div class='dash-form-group edit-item del-item'>";
+			modal += "	<div class='modal-col2'>";
+			modal += "		<div class='modal-checkbox'>";
+			modal += "			<label class='text-danger'><input type='checkbox'  name='delete' id='c-delete'> Delete event</label>";
+			modal += "		</div>";
+			modal += "	</div>";
+			modal += "<input type='hidden' name='id' class='form-control' id='id' value=''>";
+			modal += "<input type='hidden' name='color2' class='form-control' id='color2' value=''>";
+			modal += "<input type='hidden' name='notice' class='form-control' id='notice' value='N'>";
+
+			$("#modal-body").append(modal);	
+			$("#modal-body").find("#color").append("<option value=''>Choose</option>");
+			for(var i=0;i<color.length;i++){
+				$("#modal-body").find("#color").append("<option style='color:"+color[i].value+";' value='"+color[i].value+"'>"+color[i].name+"</option>")
+			}
+			/*$("#modal-body").find("#nation").append("<option value=''>Choose</option>");
+			for(var i=0;i<nation.length;i++){
+				$("#modal-body").find("#nation").append("<option value='"+nation[i].code+"'>"+nation[i].name+"</option>")
+			}
+			$("#modal-body").find("#div").append("<option value=''>Choose</option>");
+			for(var i=0;i<div.length;i++){
+				$("#modal-body").find("#div").append("<option value='"+div[i].value+"'>"+div[i].name+"</option>")
+			}*/
+			$("#modal-footer").empty();
+			var html = "<div id='cancel' class='modal-btn'>Cancel</div><div id='submit-0108' class='modal-btn submit'>Save</div>";
+			$("#modal-footer").append(html);
+		}
+
+		function getData(){
+			events = <%- JSON.stringify(events) %>;  
+			makeCalendar();
+		}; 
+
+		function makeCalendar() { 
+			
+			calendar = $('#calendar').fullCalendar({
+				header: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay,listWeek'
+				}, 
+				editable: true, 
+				defaultDate: new Date().toISOString().slice(0,10), //'2017-04-12',
+				navLinks: true, // can click day/week names to navigate views
+				eventLimit: true, // allow "more" link when too many events 
+				selectable: true,
+				selectHelper: true, 
+				//droppable: true, // this allows things to be dropped onto the calendar
+				select: function(start, end) {
+					makeSearch();
+					$("#dash-modal").find('.color-item').css("display", "table");
+					$("#dash-modal").find('.del-item').css("display", "table");
+					$("#dash-modal").find('.submit').css("display", "inline-block");
+					
+					$("#dash-modal").find("input:checkbox[id='c-delete']").prop("checked", false);
+					$("#dash-modal").find("input:checkbox[id='c-allday']").prop("checked", true);
+					$("#modal-title").text("Add Event");
+					$("#dash-modal").find('.add-item').css("display", "table");
+					$("#dash-modal").find('.edit-item').css("display", "none");
+					$("#dash-modal").find('.admin-item').css("display", "none");
+					$("#dash-modal").find('.public-item').css("display", "table");
+					/*if(jQuery.inArray(emp_id, admin) > -1){
+						$("#dash-modal").find('.admin-item').css("display", "table");
+					} */
+					$("#dash-modal").find('#start').val(moment(start).format('YYYY-MM-DD'));
+					$("#dash-modal").find('#end').val(moment(end).format('YYYY-MM-DD'));
+					$("#dash-modal").find('#title').val("");
+					$("#dash-modal").find('#color').val("");
+					$("#dash-modal").find('#id').val("");
+					$("#dash-modal").find('#color2').val("");
+					$("#dash-modal").find('#notice').val("N");
+					$("#dash-modal").find('#nation').val("");
+					$("#dash-modal").find('#descr').val("");
+					
+					$("#dash-modal").fadeIn();
+				},
+				eventRender: function(event, element) {
+					
+					/*if(event.notice == "Y"){
+						var matchedItem = getMatchedJSON( nation, "code", event.nation);
+				
+						if(matchedItem.length > 0){
+							element.find('.fc-content').prepend("<span class='c-nation-flag c-nation-"+matchedItem[0].flag+"'></spna>")
+						}
+						//event.disableDragging();
+						//event.disableResizing();
+					}
+					*/
+					event.startEditable = true;
+					event.durationEditable = true;
+					/*if(jQuery.inArray(emp_id, admin) == -1 && event.notice == "Y"){
+						event.startEditable = false;
+						event.durationEditable = false;
+					}*/
+					
+					
+					element.bind('dblclick', function() {
+						makeSearch();
+						debugger;
+						$("#dash-modal").find('.color-item').css("display", "table");
+						$("#dash-modal").find('.del-item').css("display", "table");
+						$("#dash-modal").find('.submit').css("display", "inline-block");
+						
+						
+						$("#dash-modal").find("input:checkbox[id='c-delete']").prop("checked", false);
+						$("#modal-title").text("Edit Event");
+						$("#dash-modal").find('.add-item').css("display", "none");
+						$("#dash-modal").find('.edit-item').css("display", "table");
+						$("#dash-modal").find('.admin-item').css("display", "none");
+						$("#dash-modal").find('.public-item').css("display", "table");
+
+						$("#dash-modal").find('#id').val(event.id);
+						$("#dash-modal").find('#title').val(event.title);
+						$("#dash-modal").find('#color').val(event.color);
+
+						if(event.allday == "Y") { 
+						//if($("#dash-modal").find("input:checkbox[id='c-allday']").is(":checked") == true){
+							$("#dash-modal").find('#start').val(moment(event.start).format('YYYY-MM-DD'));
+							$("#dash-modal").find('#end').val(moment(event.end).format('YYYY-MM-DD'));
+							$("#dash-modal").find("input:checkbox[id='c-allday']").prop("checked", true);
+						} 
+						else{
+							$("#dash-modal").find('#start').val(moment(event.start).format('YYYY-MM-DD HH:mm:ss'));
+							$("#dash-modal").find('#end').val(moment(event.end).format('YYYY-MM-DD HH:mm:ss'));
+							$("#dash-modal").find("input:checkbox[id='c-allday']").prop("checked", false);
+						} 
+
+						var descr = event.descr;
+						if(!isNull(descr)){
+							descr = event.descr.replace(/<br>/g, "\n");
+						}
+						$("#dash-modal").find('#descr').val(descr);
+						$("#dash-modal").find('.color-item').css("display", "table");
+						$("#dash-modal").find('#title').attr("readonly",false);
+						$("#dash-modal").find('#descr').attr("readonly",false);
+						$("#dash-modal").find('.submit').css("display", "inline-block");
+						//if(event.notice == "Y"){
+						//	$("#dash-modal").find('.del-item').css("display", "none");
+						//	$("#dash-modal").find('.submit').css("display", "none");
+						//	$("#dash-modal").find('.color-item').css("display", "none");
+						//	$("#dash-modal").find('#title').attr("readonly",true);
+						//	$("#dash-modal").find('#descr').attr("readonly",true);
+						//	
+						//}
+						//if(jQuery.inArray(emp_id, admin) > -1 && event.notice == "Y"){
+						//	$("#dash-modal").find('.admin-item').css("display", "table");								
+						//	$("#dash-modal").find('.del-item').css("display", "table");
+						//	$("#dash-modal").find('.submit').css("display", "inline-block");
+						//	$("#dash-modal").find('#title').attr("readonly",false);
+						//	$("#dash-modal").find('#descr').attr("readonly",false);
+						//	$("#dash-modal").find('#color2').val(event.color);
+							//$("#dash-modal").find('#notice').val(event.notice);
+							//$("#dash-modal").find('#nation').val(event.nation);
+							//$("#dash-modal").find('#div').val(event.div);
+						//} 
+						$("#dash-modal").fadeIn();
+					});
+				},
+				eventDrop: function(event, delta, revertFunc) { // si changement de position
+
+					edit(event);
+
+				},
+				eventResize: function(event,dayDelta,minuteDelta,revertFunc) { // si changement de longueur
+
+					edit(event);
+
+				},
+				events: events 
+			});
+
+			setEvent();
+		};
+
+		function makeScroll(){
+				obj.find( ".fc-scroller" ).css( {"overflow-y":"visible", "height":"auto"} );
+				obj.find( ".fc-widget-header" ).css("margin-right","0px");
+				obj.find( "#calendar").wrap( "<div class='scrollbar-inner'></div>" );
+				
+				obj.find(".scrollbar-inner").slimScroll({
+			        height: "100%"
+			    });
+				
+			};
+			function edit(event){ 
+				var dateFormat = event.allday = "Y" ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss'; 
+				var start = event.start.format(dateFormat);
+				var end;
+				if(event.end){
+					end = event.end.format(dateFormat);
+				}else{
+					end = start;
+				}
+				
+				var id =  event.id;
+				var tType = "update";
+				
+				var target_url = host + "/edit"; //"http://localhost:80/edit";//"http://125.128.119.204:80/edit"; 
+
+				/**/
+				/**/
+				var data ={}; 
+				data.tType = tType; 
+				data.start = start; 
+				data.end = end;  
+				data.id = id; 
+				
+
+				$.ajax({
+					url: target_url,  
+					data: data,
+					type: 'POST',
+					cache: false,
+					contentType: "application/x-www-form-urlencoded; charset=utf-8",  
+					success: function(data) {
+						$("#dash-modal").fadeOut();
+						//getData();
+					}
+				});
+
+			}
+			function getMatchedJSON(obj, key, val) {
+				var objects = [];
+				for (var i in obj) {
+					if (!obj.hasOwnProperty(i)) continue;
+					if (typeof obj[i] == 'object') {
+						objects = objects.concat(getMatchedJSON(obj[i], key, val));
+					} else if (i == key && obj[key] == val) {
+						objects.push(obj);
+					}
+				}
+				return objects;
+			};
+		
+			function setSize(){
+				targetEl = obj.find("#calendar");
+				var tabNo = "";
+				if ( targetEl.css("display") == "block") {
+					tabNo = "";
+			    } else {
+			    	tabNo = "2";			    	
+			    }				
+				obj.find(".calendar-d").css("display","block");
+				
+				obj.stop(true, true).animate( { width : "100%", height: ($("#"+options.WRAP).height()-105) + "px" } );
+				obj.find('#calendar').fullCalendar('option', 'height', ($("#"+options.WRAP).height()-105) );
+				obj.find('#calendar2').fullCalendar('option', 'height', ($("#"+options.WRAP).height()-105) );
+				obj.find(".calendar-d").css("display","none");
+				obj.find("#calendar"+tabNo).css("display","block");
+				
+				//makeScroll();
+				
+			}
+
+			
+			function setEvent(){
+				
+				/*$("#"+options.WRAP).off("click", ".update-btn").on("click", ".update-btn", function (e) {
+					obj.css("display", "none");
+					$("#dash-modal").css("display", "none");
+					obj.find(".calendar-d").css("display","block");
+					setTimeout(function(){ obj.fadeIn();getData(); }, 300);
+					
+				});*/
+				
+				var waitForFinalEvent = (function () {
+				  var timers = {};
+				  return function (callback, ms, uniqueId) {
+				    if (!uniqueId) {
+				      uniqueId = "Don't call this twice without a uniqueId";
+				    }
+				    if (timers[uniqueId]) {
+				      clearTimeout (timers[uniqueId]);
+				    }
+				    timers[uniqueId] = setTimeout(callback, ms);
+				  };
+				})();
+				
+				$(window).resize(function() {
+					waitForFinalEvent(function(){
+					    //alert('Resize...');#calWrap
+						//setSize();
+						
+					}, 300, "some unique string");
+				});
+				
+				/*
+				$("#dash-modal").off("change", "#nation").on("change", "#nation", function (e) {
+					$("#dash-modal").find('#color2').val("");
+					var thisVal = $("#dash-modal").find('#nation').val();
+					var matchedItem = getMatchedJSON( nation, "code", thisVal);
+					$("#dash-modal").find('#color2').val(matchedItem[0].color);
+					$("#dash-modal").find('.color-item').css("display","none");
+					$("#dash-modal").find('#notice').val("Y");
+				});
+				*/
+				$("#dash-modal").off("click", "#c-allday").on("click", "#c-allday", function (e) {
+					var start = $("#dash-modal").find('#start').val(); 
+					var end = $("#dash-modal").find('#end').val(); 
+
+					if($("#dash-modal").find("input:checkbox[id='c-allday']").is(":checked") == true){
+						$("#dash-modal").find('#start').val(moment(start).format('YYYY-MM-DD'));
+						$("#dash-modal").find('#end').val(moment(end).format('YYYY-MM-DD'));
+					} 
+					else{
+						$("#dash-modal").find('#start').val(moment(start).format('YYYY-MM-DD HH:mm:ss'));
+						$("#dash-modal").find('#end').val(moment(end).format('YYYY-MM-DD HH:mm:ss'));
+					} 
+
+					
+				});
+				
+
+				$("#dash-modal").off("click", "#cancel").on("click", "#cancel", function (e) {
+					$("#dash-modal").fadeOut();
+				});
+
+				$("#dash-modal").off("click", "#submit-0108").on("click", "#submit-0108", function (e) {	
+					if($("#dash-modal").find('#title').val() == 0){
+						alert("제목을 입력하세요.");
+						$("#dash-modal").find('#title').focus();
+						return false;						
+					}
+
+					var title = $("#dash-modal").find('#title').val();//encodeURIComponent($("#dash-modal").find('#title').val());
+					var color = $("#dash-modal").find('#color').val();//encodeURIComponent($("#dash-modal").find('#color').val());
+					var eventColor = $("#dash-modal").find('#color').val();
+					var start = $("#dash-modal").find('#start').val();
+					var end = $("#dash-modal").find('#end').val();
+					var id = $("#dash-modal").find('#id').val();
+					//var nation = $("#dash-modal").find('#nation').val();
+					//var div = $("#dash-modal").find('#div').val();
+					//var notice = $("#dash-modal").find('#notice').val();
+					var descr = $("#dash-modal").find('#descr').val().replace(/\n/g, "<br>");
+					//encodeURIComponent($("#dash-modal").find('#descr').val().replace(/\n/g, "<br>"));
+
+					var del="N";
+					if($("#dash-modal").find("input:checkbox[id='c-delete']").is(":checked") == true){
+						del="Y";
+					}
+
+					var allday = "N"; 
+					if($("#dash-modal").find("input:checkbox[id='c-allday']").is(":checked") == true){
+						allday="Y";
+					}
+
+					var tType = "add";
+					if(id !=""){
+						tType = "editTitle";
+					}
+					if ( !isNull($("#dash-modal").find('#color2').val())  && jQuery.inArray(emp_id, admin) > -1 && notice == "Y"){
+						color =  encodeURIComponent($("#dash-modal").find('#color2').val());
+						eventColor = $("#dash-modal").find('#color2').val();
+					}
+
+					var target_url = host + "/edit"; //"http://localhost:80/edit";//"http://125.128.119.204:80/edit";
+					var param = '?tType='+tType+'&title='+ title+'&start='+ start +'&end='+ end +'&id='+ id +'&del='+ del +'&descr='+ descr +'&color='+ color;
+					target_url = target_url; //+ param;
+					console.log(target_url); 
+					
+					debugger; 
+
+					var data ={}; 
+					data.tType = tType; 
+					data.title = title;
+					data.start = start; 
+					data.end = end;  
+					data.id = id; 
+					data.del = del; 
+					data.descr = descr; 
+					data.color = color; 
+					data.del = del;  
+					data.allday = allday; 
+
+					$.ajax({
+						url: target_url,  
+						data: data,
+						/*dataType: 'jsonp',
+						jsonp: 'callback', 
+						timeout: 300000,
+						crossDomain: true,*/
+						type: 'POST',
+						cache: false,
+						contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+						success: function(data) {
+						debugger;
+							$("#dash-modal").fadeOut();
+							//alert(data);
+							if (tType == "add"){
+								//events.push({id:data[i].ID, title:data[i].TITLE, start:start, end:end, color:data[i].COLOR, descr:data[i].DESCRIPTION}); 
+								calendar.fullCalendar('renderEvent',  {
+									id : data.id,//data.id[0][0].ID,
+									title: $("#dash-modal").find('#title').val(),
+									start: start,
+									end: end,
+									color: eventColor,
+									descr: $("#dash-modal").find('#descr').val(), 
+									allday: allday 
+								},  true  );						   
+								calendar.fullCalendar('unselect'); 
+							} else if(tType == "editTitle"){
+								if(del == "N"){
+									var eventObject = calendar.fullCalendar( 'clientEvents', id )[0];
+									if (eventObject != null) {
+							            eventObject.title = $("#dash-modal").find('#title').val();
+							            eventObject.color = eventColor;		
+							            eventObject.descr =  $("#dash-modal").find('#descr').val();
+										eventObject.start =  $("#dash-modal").find('#start').val();
+										eventObject.end =  $("#dash-modal").find('#end').val(); 
+							            calendar.fullCalendar( 'updateEvent', eventObject );
+							        }
+									
+								} else {
+									calendar.fullCalendar('removeEvents', id);
+								}
+								
+							}
+							
+						}
+					});
+					
+				});
+				
+			};	
+
+	});
+    </script> 
+	<style>
+		#calendar {
+			max-width: 900px;
+			margin: 0 auto; 
+		}
+
+	</style>
+  </head>
+  <body class="container"> 
+
+	<header>
+        <% include ./partials/header %>
+    </header>
+	<main>
+        <div id="calendar" class="col-centered calendar-d"></div>
+		<div class="" id="dash-modal">
+			<div class="" id="dash-modal-dialog">
+				<div class="" id="dash-modal-content">
+					<div class="" id="modal-header">
+						<div class="" id="modal-title" toolTip=""></div>
+					</div>
+					<div class="" id="modal-body"></div>
+					<div class="" id="modal-footer"></div>
+				</div>
+			</div>
+		</div>
+    </main>
+	<footer>
+        <% include ./partials/footer %>
+    </footer>
+  </body>
+</html>
